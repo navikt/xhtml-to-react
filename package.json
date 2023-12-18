@@ -1,0 +1,22 @@
+{
+  "name": "xhtml-to-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fast-xml-parser": "^4.3.2",
+    "glob": "^10.3.10",
+    "html-tags": "^3.3.1",
+    "prettier": "^3.1.0",
+    "react-attr-converter": "^0.3.1",
+    "react-css": "^0.0.2",
+    "style-to-object": "^1.0.5",
+    "typescript": "^5.3.2"
+  }
+}
