@@ -765,6 +765,10 @@ class Visitor {
       this.visitNavWCNode(node as NavWebComponentNode);
     } else if ('t:div' in node) {
       this.visitDiv(node as DivNode);
+    } else if ('h:inputHidden' in node) {
+      this.addWarning('h:inputHidden is not implemented in the migration script.');
+    } else if ('h:outputStylesheet' in node) {
+      this.addWarning('h:outputStylesheet is not implemented in the migration script.');
     } else {
       throw new Error('Unknown node: ' + JSON.stringify(node));
     }
@@ -1327,6 +1331,8 @@ class Visitor {
           this.addWarning('WARN: <c:if> in <t:outputText> is not supported, so we have to rewrite it manually.');
         } else if (key === '#text') {
           this.addWarning('WARN: #text in <t:outputText> was probably added in PSAK by mistake.');
+        } else if (key === 'nav:outputPid') {
+          this.addWarning('WARN: <nav:outputPid> in <t:outputText> is probably a mistake. This should be migrated manually!');
         } else {
           throw new Error('WARN: Unknown child in <t:outputText>: ' + key);
         }
@@ -2505,7 +2511,7 @@ class Visitor {
       });
     }
     this.withStringShouldBeJSX(() => {
-      for (const child of node['h:outputLabel']) {
+      for (const child of (node['h:outputLabel'] ?? node['t:outputLabel'] ?? [])) {
         this.visit(child);
         children.push(this.result);
       }
@@ -3255,6 +3261,8 @@ class Visitor {
       }
     }
 
+    let label;
+
     for (const child of (node['t:selectOneMenu'] ?? node['h:selectOneMenu'])) {
       // if it's a f:selectItem, we should read itemLabel and itemValue and add it to options
       if ('t:selectItem' in child || 'f:selectItem' in child) {
@@ -3379,12 +3387,17 @@ class Visitor {
         );
       } else if ('h:commandButton' in child) {
         // For some reason, this is actually done in JSF, but let's just skip it.
+      } else if ('t:outputLabel' in child || 'h:outputLabel' in child) {
+        this.visitOutputLabel(child);
+        label = this.result;
+      } else if ('script' in child) {
+        this.addWarning('WARN: <script> in selectOneMenu is not supported.');
       } else {
         throw new Error('Unexpected child ' + Object.keys(child).join(', '));
       }
     }
 
-    this.result = ts.factory.createJsxElement(
+    let result = ts.factory.createJsxElement(
       ts.factory.createJsxOpeningElement(
         ts.factory.createIdentifier(tagName),
         undefined,
@@ -3393,6 +3406,18 @@ class Visitor {
       options,
       ts.factory.createJsxClosingElement(ts.factory.createIdentifier(tagName)),
     );
+
+    // if label is not undefined, then result should be <>{label}{result}</>
+    if (label !== undefined) {
+      result = ts.factory.createJsxFragment(
+        ts.factory.createJsxOpeningFragment(),
+        [label, result],
+        ts.factory.createJsxJsxClosingFragment(),
+      );
+    }
+
+    this.result = result;
+
     this.handleRenderedProp(rendered);
   }
 
@@ -3615,8 +3640,9 @@ class Visitor {
             listener,
           ),
         );
-
         // this.result = onChange;
+      } else if ('#text' in child) {
+        this.addWarning('WARN: unexpected text in selectOneRadio: ' + child['#text']);
       } else {
         throw new Error('Unexpected child in t:selectOneRadio: ' + Object.keys(child).join(', '));
       }

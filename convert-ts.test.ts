@@ -511,6 +511,20 @@ test('selectOneMenu', async () => {
   );
 });
 
+test('selectOneMenu with a label inside it', () => {
+  expect(
+    convert(`
+    <t:selectOneMenu id="foo" value="#{form.foo}">
+      <t:selectItem itemLabel="Bar" itemValue="bar" />
+      <f:selectItem itemLabel="Baz" itemValue="baz" />
+      <h:outputLabel for="selectedYearId" styleClass="hidden">the label</h:outputLabel>
+    </t:selectOneMenu>
+    `),
+  ).toBe(
+    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value="#{form.foo}"><option value="bar">Bar</option><option value="baz">Baz</option></Select></>\n`,
+  );
+})
+
 test('selectOneMenu with displayValueOnly', async () => {
   expect(
     await convert(`
