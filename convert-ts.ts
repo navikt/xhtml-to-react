@@ -532,10 +532,14 @@ function enforceInteger(input: string): number {
 }
 
 function numericValue(value: number) {
-  return ts.factory.createJsxText('{' + enforceInteger(value) + '}')
+  return ts.factory.createJsxText('{' + value + '}')
 }
 
-export function convert(input: string, options: Options = defaultOptions): string {
+export function convert(input: string, options: Partial<Options> = defaultOptions): string {
+  const opts = {
+    ...defaultOptions,
+    ...options
+  };
   const parser = new XMLParser({
     ignoreAttributes: false,
     // isArray: () => true,
@@ -543,11 +547,11 @@ export function convert(input: string, options: Options = defaultOptions): strin
   });
   const json: XmlNode[] = parser.parse(input);
 
-  const visitor = new Visitor(options);
+  const visitor = new Visitor(opts);
   visitor.visitAll(json);
   let ast = [visitor.result];
 
-  if (options.addImports) {
+  if (opts.addImports) {
     const imports = Object.entries(visitor.imports).map(([path, components]) => {
       return ts.factory.createImportDeclaration(
         undefined,
