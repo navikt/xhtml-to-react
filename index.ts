@@ -24,7 +24,7 @@ function parsePropertiesFile(input: string): Record<string, string> {
 }
 
 try {
-  const messageSource = parsePropertiesFile(fs.readFileSync('../pesys/psak/src/main/resources/no-nav-pensjon-psak-resources.properties', 'utf8'));
+  const messageSource = parsePropertiesFile(fs.readFileSync('../pensjon-psak/psak/src/main/resources/no-nav-pensjon-psak-resources.properties', 'utf8'));
 
   const skip = [
     'visjournalpost.xhtml',
@@ -46,7 +46,7 @@ try {
   ];
   const files = glob
     .sync(
-      '../pesys/psak/src/main/resources/webapp/pages/**/*.xhtml',
+      '../pensjon-psak/psak/src/main/resources/webapp/pages/**/*.xhtml',
     )
     .filter((file) => !skip.some((skipFile) => file.endsWith(skipFile)));
 
@@ -64,7 +64,7 @@ try {
     // const output = currentDirname + '/output';
     const output = currentDirname + '/../storybook-psak/src/generated';
 
-    const outputPath = file.replace('../pesys/psak/src/main/resources/webapp/pages', output).replace('.xhtml', '.tsx');
+    const outputPath = file.replace('../pensjon-psak/psak/src/main/resources/webapp/pages', output).replace('.xhtml', '.tsx');
     const outputDir = outputPath.substring(0, outputPath.lastIndexOf('/'));
     // make dir recursive
     fs.mkdirSync(outputDir, {recursive: true});
