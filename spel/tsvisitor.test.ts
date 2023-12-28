@@ -93,6 +93,11 @@ test("empty-expression", () => {
   assertDeepEqual(print(result), `isEmpty(a)`);
 });
 
+test.skip("And-expression", () => {
+  const result = toTypeScript("#{not a.nex and b}");
+  assertDeepEqual(print(result), `!a.nex && b`);
+});
+
 /*
 test("Illegal expression (not terminated)", () => {
   assert.throws(() => toTypeScript("#{foobar"));
@@ -102,4 +107,10 @@ test("Illegal expression (not terminated)", () => {
 test("Complicated expression", () => {
   const result = toTypeScript("#{foobar && 123 ? 1 : 2 == a.b.c}");
   assertDeepEqual(print(result), `foobar && (123 ? 1 : 2 === a.b.c)`);
+});
+
+test("some edge case", () => {
+  // "#{form.showtilleggsytelse}"
+  const result = toTypeScript("#{form.showtilleggsytelse}");
+  assertDeepEqual(print(result), `form.showtilleggsytelse`);
 });

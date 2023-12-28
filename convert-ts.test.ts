@@ -4,9 +4,9 @@ import {convert} from './convert-ts';
 test('should work with outputText', () => {
   expect(
     convert(`
-<t:outputText value="#{form.aar}"/>
+<t:outputText value="#{form.aar invalid EL}"/>
     `),
-  ).toBe(`<>{SPEL("#{form.aar}")}</>\n`);
+  ).toBe(`<>{SPEL("#{form.aar invalid EL}")}</>\n`);
 });
 
 test('empty outputText', () => {
@@ -35,7 +35,7 @@ test('outputText with rendered prop', () => {
     convert(`
     <t:outputText value="#{row.enhetNavn}" rendered="#{!row.editable}"/>
     `),
-  ).toBe(`{"#{!row.editable}" && <>{SPEL("#{row.enhetNavn}")}</>}\n`);
+  ).toBe(`{!row.editable && <>{row.enhetNavn}</>}\n`);
 });
 
 test('should work with CSS class', () => {
@@ -64,7 +64,7 @@ test('h: prefix should work with outputText', () => {
     convert(`
 <h:outputText value="#{form.aar}"/>
     `),
-  ).toBe(`<>{SPEL("#{form.aar}")}</>\n`);
+  ).toBe(`<>{form.aar}</>\n`);
 });
 
 test('outputText with convertNumber', () => {
@@ -101,7 +101,7 @@ test('outputText with converter', () => {
     </t:outputText>
     `),
   ).toBe(
-    `<>{convert({ converter: "no.stelvio.SomeConverter", attributes: { "foo": "foo-value", "bar": "bar-value" }, value: "#{form.from}" })}</>\n`,
+    `<>{convert({ converter: "no.stelvio.SomeConverter", attributes: { "foo": "foo-value", "bar": "bar-value" }, value: form.from })}</>\n`,
   );
 });
 
@@ -114,7 +114,7 @@ test('stelvio date converter', () => {
     </t:outputText>
     `),
   ).toBe(
-    `<>{formatDate("#{form.from}")}</>\n`,
+    `<>{formatDate(form.from)}</>\n`,
   );
 });
 
@@ -126,7 +126,7 @@ test('stelvio calendar converter', () => {
     </t:outputText>
     `),
   ).toBe(
-    `<>{formatDate("#{form.from}")}</>\n`,
+    `<>{formatDate(form.from)}</>\n`,
   );
 });
 
@@ -136,7 +136,7 @@ test('outputText with converter (shorthand)', () => {
     <t:outputText value="#{form.from}" converter="no.stelvio.SomeConverter" />
     `),
   ).toBe(
-    `<>{convert({ converter: "no.stelvio.SomeConverter", value: "#{form.from}" })}</>\n`,
+    `<>{convert({ converter: "no.stelvio.SomeConverter", value: form.from })}</>\n`,
   );
 });
 
@@ -162,7 +162,7 @@ test('plain old HTML with rendered attribute', () => {
  </div>
      `),
   ).toBe(
-    `{"#{form.show}" && <div>Something</div>}\n`,
+    `{form.show && <div>Something</div>}\n`,
   );
 });
 
@@ -185,7 +185,7 @@ test('htmlTag with rendered attribute', () => {
     convert(`
     <t:htmlTag value="div" id="test-id" style="width: 100px; height: 200px" styleClass="outer" rendered="#{form.show}">Foo</t:htmlTag>
     `)
-  ).toBe(`{"#{form.show}" && <div id="test-id" style={{ "width": "100px", "height": "200px" }} className="outer">Foo</div>}\n`);
+  ).toBe(`{form.show && <div id="test-id" style={{ "width": "100px", "height": "200px" }} className="outer">Foo</div>}\n`);
 });
 
 test('htmlTag with params', () => {
@@ -382,7 +382,7 @@ test('Data Table', () => {
           </t:dataTable>
           `),
   ).toBe(
-    `<DataTable id="the-id" className="the-class-name" style={{ "color": "red" }} headerClassName="the-header-class" columnClasses="a, b, c" rowClasses="d, e, f" footerClassName="the-footer-class"><thead><tr><th>Global header</th></tr></thead><thead><tr><th><span>Foo</span></th><th>Bar</th></tr></thead><tbody>{"#{form.inntektsDetaljer}".map((post, theIndexVar) => <tr className="#{post.rowStyle}"><td className="a">Foo Content</td><td className="b">Bar Content</td></tr>)}</tbody><tfoot><tr><td>Foo Footer</td><td>Bar Footer</td></tr></tfoot><tfoot><tr><td className="the-footer-class" colSpan={9999}>Global footer</td></tr></tfoot></DataTable>\n`,
+    `<DataTable id="the-id" className="the-class-name" style={{ "color": "red" }} headerClassName="the-header-class" columnClasses="a, b, c" rowClasses="d, e, f" footerClassName="the-footer-class"><thead><tr><th>Global header</th></tr></thead><thead><tr><th><span>Foo</span></th><th>Bar</th></tr></thead><tbody>{form.inntektsDetaljer.map((post, theIndexVar) => <tr className="#{post.rowStyle}"><td className="a">Foo Content</td><td className="b">Bar Content</td></tr>)}</tbody><tfoot><tr><td>Foo Footer</td><td>Bar Footer</td></tr></tfoot><tfoot><tr><td className="the-footer-class" colSpan={9999}>Global footer</td></tr></tfoot></DataTable>\n`,
   );
 });
 
@@ -507,7 +507,7 @@ test('selectOneMenu', async () => {
       }
     }),
   ).toBe(
-    `<Select id="foo" value="#{form.foo}"><option value="foo">ABC</option><option value="bar">Bar</option>{props["#{form.personList}"].map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select>\n`,
+    `<Select id="foo" value={form.foo}><option value="foo">ABC</option><option value="bar">Bar</option>{props["#{form.personList}"].map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select>\n`,
   );
 });
 
@@ -521,7 +521,7 @@ test('selectOneMenu with a label inside it', () => {
     </t:selectOneMenu>
     `),
   ).toBe(
-    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value="#{form.foo}"><option value="bar">Bar</option><option value="baz">Baz</option></Select></>\n`,
+    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value={form.foo}><option value="bar">Bar</option><option value="baz">Baz</option></Select></>\n`,
   );
 })
 
@@ -537,7 +537,7 @@ test('selectOneMenu with displayValueOnly', async () => {
       }
     }),
   ).toBe(
-    `<Select id="foo" value="#{form.foo}" displayValueOnly="#{something}"><option value="bar">Bar</option></Select>\n`,
+    `<Select id="foo" value={form.foo} displayValueOnly={something}><option value="bar">Bar</option></Select>\n`,
   );
 });
 
@@ -770,7 +770,7 @@ test('if condition segfault reproduction', () => {
     convert(`
     <ui:composition template="my-template.xhtml">
         <ui:define name="my-input" >
-            <c:if test="the-test">
+            <c:if test="#{the.test}">
                 content
             </c:if>
         </ui:define>
@@ -778,7 +778,7 @@ test('if condition segfault reproduction', () => {
 `, {
       messageSource: {},
       addImports: true,
-    })).toBe(`import { MyTemplate } from "./MyTemplate";\n<MyTemplate my-input={"the-test" && <>content</>}/>\n`);
+    })).toBe(`import { MyTemplate } from "./MyTemplate";\n<MyTemplate my-input={the.test && <>content</>}/>\n`);
 });
 
 test('when condition', () => {
@@ -913,7 +913,7 @@ test('ui repeat', () => {
         <div>#{vedtak}</div>
       </ui:repeat>
     `)
-  ).toBe(`{"#{form.vedtakList}".map(vedtak => <><div>{SPEL("#{vedtak}")}</div></>)}\n`);
+  ).toBe(`{form.vedtakList.map(vedtak => <><div>{vedtak}</div></>)}\n`);
 });
 
 test('ui repeat with varStatus', () => {
@@ -923,7 +923,7 @@ test('ui repeat with varStatus', () => {
         <div>#{vedtak}</div>
       </ui:repeat>
     `)
-  ).toBe(`{"#{form.vedtakList}".map(({ vedtak, rowStatus }) => <><div>{SPEL("#{vedtak}")}</div></>)}\n`);
+  ).toBe(`{form.vedtakList.map(({ vedtak, rowStatus }) => <><div>{vedtak}</div></>)}\n`);
 });
 
 test('ui repeat inside div', () => {
@@ -935,7 +935,7 @@ test('ui repeat inside div', () => {
       </ui:repeat>
     </div>
     `)
-  ).toBe(`<div>{"#{form.vedtakList}".map(vedtak => <><div>{SPEL("#{vedtak}")}</div></>)}</div>\n`);
+  ).toBe(`<div>{form.vedtakList.map(vedtak => <><div>{vedtak}</div></>)}</div>\n`);
 });
 
 test('ui repeat inside tbody', () => {
@@ -948,7 +948,7 @@ test('ui repeat inside tbody', () => {
     </tr>
   </ui:repeat>
 </tbody>
-`)).toBe(`<tbody>{"#{variable}".map(row => <><tr>Something</tr></>)}</tbody>\n`);
+`)).toBe(`<tbody>{variable.map(row => <><tr>Something</tr></>)}</tbody>\n`);
 });
 
 test('ui repeat inside define', () => {
@@ -962,7 +962,7 @@ test('ui repeat inside define', () => {
     </ui:define>
 </ui:decorate>
     `)
-  ).toBe(`<MyTemplate input={"#{items}".map(item => <>Foo</>)}/>\n`);
+  ).toBe(`<MyTemplate input={items.map(item => <>Foo</>)}/>\n`);
 });
 
 test('outputFormat', () => {
@@ -1109,7 +1109,7 @@ test('data list (simple layout)', () => {
       <h:outputText value="#{vedtak}" />
     </t:dataList>
     `
-    )).toBe(`<div className="the-css-class">{"#{form.vedtakList}".map((vedtak, theIdx) => <><>{SPEL("#{vedtak}")}</></>)}</div>\n`);
+    )).toBe(`<div className="the-css-class">{form.vedtakList.map((vedtak, theIdx) => <><>{vedtak}</></>)}</div>\n`);
 });
 
 test('data list (unordered layout)', () => {
@@ -1119,7 +1119,7 @@ test('data list (unordered layout)', () => {
         <h:outputText value="#{adresselinje}"/>
     </t:dataList>
     `
-    )).toBe(`<ul className="adresse">{"#{form.adresselinjeList}".map(adresselinje => <li><>{SPEL("#{adresselinje}")}</></li>)}</ul>\n`);
+    )).toBe(`<ul className="adresse">{form.adresselinjeList.map(adresselinje => <li><>{adresselinje}</></li>)}</ul>\n`);
 });
 
 test('translations', () => {
@@ -1152,7 +1152,7 @@ test('reproduce a bug that crashed Prettier', () => {
             </ui:decorate>
 
     `)
-  ).toBe(`<MyTemplate prop={<div>{"#{myList}".map(data => <>{"#{data.ytelseskomponentListe}".map(({ ytelse, ytelseStatus }) => <><tr><td>Stuff</td></tr></>)}</>)}</div>}/>\n`);
+  ).toBe(`<MyTemplate prop={<div>{myList.map(data => <>{data.ytelseskomponentListe.map(({ ytelse, ytelseStatus }) => <><tr><td>Stuff</td></tr></>)}</>)}</div>}/>\n`);
 });
 
 test('Some weird input XHTML, remove body tag from output', () => {

@@ -3,6 +3,7 @@ import ts from 'typescript';
 import convertToReactAttributeName from 'react-attr-converter';
 import {fromCSS} from 'react-css';
 import htmlTags from 'html-tags';
+import {toTypeScript} from "./spel/tsvisitor";
 
 // <desc> from SVG
 const allHtmlTags = [...htmlTags, 'desc', 'path', 'font'];
@@ -535,6 +536,17 @@ function numericValue(value: number) {
   return ts.factory.createJsxText('{' + value + '}')
 }
 
+function spelOrStringLiteral(input: string) {
+  let inputAst;
+  try {
+    inputAst = toTypeScript(input);
+  } catch (err) {
+    console.error('Could not parse SPEL: ' + input, err);
+    inputAst = ts.factory.createStringLiteral(input);
+  }
+  return inputAst;
+}
+
 export function convert(input: string, options: Partial<Options> = defaultOptions): string {
   const opts = {
     ...defaultOptions,
@@ -786,6 +798,14 @@ class Visitor {
 
   handleRenderedProp(expression: string) {
     if (expression !== undefined && expression !== 'true') {
+      let ast;
+      try {
+        ast = toTypeScript(expression);
+      } catch (err) {
+        console.warn('could not parse SPEL for ' + expression, err);
+        ast = ts.factory.createStringLiteral(expression);
+      }
+
       // Generate a JSX expression with an AND expression based on this.result:
       // {expression && the-result-here}
       // For example:
@@ -793,7 +813,7 @@ class Visitor {
       this.result = ts.factory.createJsxExpression(
         undefined,
         ts.factory.createBinaryExpression(
-          ts.factory.createStringLiteral(expression),
+          ast,
           ts.factory.createToken(ts.SyntaxKind.AmpersandAmpersandToken),
           this.result,
         ),
@@ -829,15 +849,23 @@ class Visitor {
 
     if (this.stringShouldBeJSX) {
       if (text.indexOf('#{') !== -1) {
+        let ast;
+        try {
+          ast = toTypeScript(text);
+        } catch (err) {
+          console.warn('could not parse SPEL for ' + text, err);
+          ast = ts.factory.createCallExpression(
+            ts.factory.createIdentifier('SPEL'),
+            undefined,
+            [ts.factory.createStringLiteral(text)],
+          );
+        }
+
         // create a jsx expression with a calling a function called SPEL in it
         // for example #{foobar} -> {SPEL("foobar")}
         return ts.factory.createJsxExpression(
           undefined,
-          ts.factory.createCallExpression(
-            ts.factory.createIdentifier('SPEL'),
-            undefined,
-            [ts.factory.createStringLiteral(text)],
-          ),
+          ast
         );
       } else {
         // If it includes { } < > then wrap it in jsx expression and string literal
@@ -1162,7 +1190,7 @@ class Visitor {
           ts.factory.createIdentifier('formatDate'),
           undefined,
           [
-            ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+            spelOrStringLiteral(node[':@']['@_value'] ?? ''),
           ],
         ),
       );
@@ -1174,7 +1202,7 @@ class Visitor {
           ts.factory.createIdentifier('formatDate'),
           undefined,
           [
-            ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+            spelOrStringLiteral(node[':@']['@_value'] ?? ''),
           ],
         ),
       );
@@ -1193,7 +1221,7 @@ class Visitor {
                 ),
                 ts.factory.createPropertyAssignment(
                   'value',
-                  ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+                  spelOrStringLiteral(node[':@']['@_value'] ?? ''),
                 ),
               ]),
             ],
@@ -1261,7 +1289,7 @@ class Visitor {
           attrs.push(
             ts.factory.createPropertyAssignment(
               'value',
-              ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+              spelOrStringLiteral(node[':@']['@_value'] ?? ''),
             ),
           );
 
@@ -1273,7 +1301,7 @@ class Visitor {
                 ts.factory.createIdentifier('formatDate'),
                 undefined,
                 [
-                  ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+                  spelOrStringLiteral(node[':@']['@_value'] ?? ''),
                 ],
               ),
             );
@@ -1285,7 +1313,7 @@ class Visitor {
                 ts.factory.createIdentifier('formatDate'),
                 undefined,
                 [
-                  ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+                  spelOrStringLiteral(node[':@']['@_value'] ?? ''),
                 ],
               ),
             );
@@ -1954,11 +1982,20 @@ class Visitor {
         ),
       );
     }
+
+    let valueAst;
+    try {
+      valueAst = toTypeScript(value);
+    } catch (e) {
+      // create a string literal
+      valueAst = ts.factory.createStringLiteral(value);
+    }
+
     const rowLambda = ts.factory.createJsxExpression(
       undefined,
       ts.factory.createCallExpression(
         ts.factory.createPropertyAccessExpression(
-          ts.factory.createStringLiteral(value),
+          valueAst,
           'map',
         ),
         undefined,
@@ -2080,6 +2117,14 @@ class Visitor {
       }
     }
 
+    let valueAst;
+    try {
+      valueAst = toTypeScript(value);
+    } catch (e) {
+      console.log('Could not parse value: ' + value);
+      valueAst = ts.factory.createStringLiteral(value);
+    }
+
     const children = [];
     this.withStringShouldBeJSX(() => {
       for (const child of node['t:dataList']) {
@@ -2110,7 +2155,7 @@ class Visitor {
         undefined,
         ts.factory.createCallExpression(
           ts.factory.createPropertyAccessExpression(
-            ts.factory.createStringLiteral(value),
+            valueAst,
             'map',
           ),
           undefined,
@@ -2147,7 +2192,7 @@ class Visitor {
         undefined,
         ts.factory.createCallExpression(
           ts.factory.createPropertyAccessExpression(
-            ts.factory.createStringLiteral(value),
+            valueAst,
             'map',
           ),
           undefined,
@@ -2591,10 +2636,18 @@ class Visitor {
       ];
     }
 
+    let valueAst;
+    try {
+      valueAst = toTypeScript(value);
+    } catch (e) {
+      // create a string literal
+      valueAst = ts.factory.createStringLiteral(value);
+    }
+
     const result =
       ts.factory.createCallExpression(
         ts.factory.createPropertyAccessExpression(
-          ts.factory.createStringLiteral(value),
+          valueAst,
           'map',
         ),
         undefined,
@@ -3168,7 +3221,10 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(
+              undefined,
+              spelOrStringLiteral(value)
+            )
           ),
         );
       } else if (key === '@_label') {
@@ -3223,7 +3279,10 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('displayValueOnly'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(
+              undefined,
+              spelOrStringLiteral(value)
+            )
           ),
         );
       } else if (key === '@_displayValueOnlyStyleClass') {

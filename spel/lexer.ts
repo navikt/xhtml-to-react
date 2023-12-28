@@ -91,6 +91,7 @@ export const Minus = createToken({
 export const Not = createToken({
   name: "Not",
   pattern: /!|not/,
+  longer_alt: Identifier,
 });
 
 export const Empty = createToken({
@@ -102,31 +103,37 @@ export const Empty = createToken({
 
 export const Or = createToken({
   name: "Or",
+  longer_alt: Identifier,
   pattern: /or|\|\|/,
 });
 
 export const And = createToken({
   name: "And",
+  longer_alt: Identifier,
   pattern: /and|&&/,
 });
 
 export const Eq = createToken({
   name: "Eq",
+  longer_alt: Identifier,
   pattern: /==|eq/,
 });
 
 export const NotEq = createToken({
   name: "NotEq",
+  longer_alt: Identifier,
   pattern: /!=|ne/,
 });
 
 export const Gt = createToken({
   name: "Gt",
+  longer_alt: Identifier,
   pattern: />|gt/,
 });
 
 export const Lt = createToken({
   name: "Lt",
+  longer_alt: Identifier,
   pattern: /<|lt/,
 });
 
