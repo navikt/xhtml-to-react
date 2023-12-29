@@ -88,12 +88,6 @@ export const Minus = createToken({
   pattern: /-/,
 });
 
-export const Not = createToken({
-  name: "Not",
-  pattern: /!|not/,
-  longer_alt: Identifier,
-});
-
 export const Empty = createToken({
   name: "Empty",
   pattern: /empty/,
@@ -135,6 +129,12 @@ export const Lt = createToken({
   name: "Lt",
   longer_alt: Identifier,
   pattern: /<|lt/,
+});
+
+export const Not = createToken({
+  name: "Not",
+  pattern: /!|not/,
+  longer_alt: [NotEq, Identifier],
 });
 
 /*

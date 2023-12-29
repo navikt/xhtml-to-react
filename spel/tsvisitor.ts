@@ -105,7 +105,7 @@ class ELToTypeScriptVisitor extends BaseVisitor {
         case "eq":
           token = ts.SyntaxKind.EqualsEqualsEqualsToken;
           break;
-        case "neq":
+        case "noteq":
           token = ts.SyntaxKind.ExclamationEqualsEqualsToken;
           break;
         case "and":

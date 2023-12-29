@@ -91,11 +91,19 @@ test("not-expression", () => {
 test("empty-expression", () => {
   const result = toTypeScript("#{empty a}");
   assertDeepEqual(print(result), `isEmpty(a)`);
+
+  const result2 = toTypeScript('#{empty form.utenlandskIdentitetList}');
+  assertDeepEqual(print(result2), `isEmpty(form.utenlandskIdentitetList)`);
 });
 
 test.skip("And-expression", () => {
   const result = toTypeScript("#{not a.nex and b}");
   assertDeepEqual(print(result), `!a.nex && b`);
+});
+
+test('not equal', () => {
+  const result = toTypeScript('#{form.tilbakekrevingBelopSkatt != 0}');
+  assertDeepEqual(print(result), `form.tilbakekrevingBelopSkatt !== 0`);
 });
 
 /*

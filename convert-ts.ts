@@ -848,7 +848,7 @@ class Visitor {
     }
 
     if (this.stringShouldBeJSX) {
-      if (text.indexOf('#{') !== -1) {
+      if (text.indexOf('#{') !== -1 || text.indexOf('${') !== -1) {
         let ast;
         try {
           ast = toTypeScript(text);
@@ -1259,7 +1259,7 @@ class Visitor {
                   ),
                   ts.factory.createPropertyAssignment(
                     'value',
-                    ts.factory.createStringLiteral(node[':@']['@_value'] ?? ''),
+                    spelOrStringLiteral(node[':@']['@_value'] ?? ''),
                   ),
                 ]),
               ],
@@ -1483,7 +1483,8 @@ class Visitor {
           attributes.push(
             ts.factory.createJsxAttribute(
               ts.factory.createIdentifier(reactAttributeName),
-              ts.factory.createStringLiteral(value),
+              ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
+              // ts.factory.createStringLiteral(value),
             ),
           );
         } else {
@@ -1503,7 +1504,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
+            // ts.factory.createStringLiteral(value),
           ),
         );
       } else if (key === '@_id') {
@@ -1629,7 +1631,7 @@ class Visitor {
         );
       } else if (key === '@_columnClasses') {
         // Skip auto-setup of columnClasses if it's dynamically evaluated.
-        if (!attributeValue.startsWith('#{')) {
+        if (!attributeValue.startsWith('#{') && !attributeValue.startsWith('${')) {
           columnClasses = attributeValue.split(',').map(str => str.trim());
         }
 
@@ -1689,7 +1691,9 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('footerClassName'),
-            ts.factory.createStringLiteral(attributeValue),
+            ts.factory.createJsxExpression(undefined,
+              spelOrStringLiteral(attributeValue)),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_border') {
@@ -1866,7 +1870,8 @@ class Visitor {
             footerAttributes.push(
               ts.factory.createJsxAttribute(
                 ts.factory.createIdentifier('className'),
-                ts.factory.createStringLiteral(footerClass),
+                ts.factory.createJsxExpression(undefined, spelOrStringLiteral(footerClass)),
+                // ts.factory.createStringLiteral(footerClass),
               ),
             );
           }
@@ -2823,6 +2828,7 @@ class Visitor {
     let parsedValue;
     this.withStringShouldNotBeJSX(() => {
       parsedValue = this.handleText(value);
+      // parsedValue = spelOrStringLiteral(value);
     });
 
     const functionCall = ts.factory.createCallExpression(
@@ -2933,10 +2939,18 @@ class Visitor {
 
       if (rendered !== undefined && rendered !== 'true') {
         // Render {rendered && <>{this.result}</>}
+        let renderedAst;
+        try {
+          renderedAst = toTypeScript(rendered);
+        } catch (error) {
+          console.error('Could not parse SPEL', rendered);
+          renderedAst = ts.factory.createStringLiteral(rendered);
+        }
+
         this.result = ts.factory.createJsxExpression(
           undefined,
           ts.factory.createLogicalAnd(
-            ts.factory.createStringLiteral(rendered),
+            renderedAst,
             ts.factory.createJsxFragment(
               ts.factory.createJsxOpeningFragment(),
               [this.result],
@@ -3905,7 +3919,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
+            // ts.factory.createStringLiteral(value),
           ),
         );
       } else if (key === '@_binding') {
@@ -4114,21 +4129,24 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createStringLiteral(attributeValue),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_readonly') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('readOnly'),
-            ts.factory.createStringLiteral(attributeValue),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_disabled') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('disabled'),
-            ts.factory.createStringLiteral(attributeValue),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_tabindex') {
