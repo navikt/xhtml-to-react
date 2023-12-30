@@ -14,6 +14,7 @@ import {
   Identifier,
   IntegerLiteral,
   LiteralExpression,
+  LParen,
   Lt,
   Minus,
   Not,
@@ -21,6 +22,7 @@ import {
   Or,
   QuestionMark,
   RCurl,
+  RParen,
   SingleQuoteStringLiteral,
   StartDeferredExpression,
   StartDynamicExpression,
@@ -65,24 +67,40 @@ export class ELParser extends CstParser {
 
   private expression = this.RULE("expression", () => {
     this.OR([
-      {ALT: () => this.SUBRULE(this.value, {LABEL: "lhs"})},
-      {ALT: () => this.SUBRULE(this.unaryExpression, {LABEL: "lhs"})},
-    ]);
-    this.OPTION(() => {
-      this.SUBRULE(this.binaryExpressionSuffix);
-    });
-    this.OPTION2(() => {
-      this.CONSUME(QuestionMark, {
-        LABEL: "ternary",
-      });
-      this.SUBRULE2(this.expression, {
-        LABEL: "consequent",
-      });
-      this.CONSUME(Colon);
-      this.SUBRULE3(this.expression, {
-        LABEL: "alternate",
-      });
-    });
+      {
+        ALT: () => {
+          this.CONSUME(LParen);
+          this.SUBRULE(this.expression, {LABEL: 'lhs'});
+          this.CONSUME(RParen);
+          this.OPTION(() => {
+            this.SUBRULE(this.binaryExpressionSuffix);
+          });
+        }
+      },
+      {
+        ALT: () => {
+          this.OR2([
+            {ALT: () => this.SUBRULE(this.value, {LABEL: "lhs"})},
+            {ALT: () => this.SUBRULE(this.unaryExpression, {LABEL: "lhs"})},
+          ]);
+          this.OPTION2(() => {
+            this.SUBRULE2(this.binaryExpressionSuffix);
+          });
+          this.OPTION3(() => {
+            this.CONSUME(QuestionMark, {
+              LABEL: "ternary",
+            });
+            this.SUBRULE2(this.expression, {
+              LABEL: "consequent",
+            });
+            this.CONSUME(Colon);
+            this.SUBRULE3(this.expression, {
+              LABEL: "alternate",
+            });
+          });
+        }
+      }
+    ])
   });
 
   private binaryExpressionSuffix = this.RULE("binaryExpressionSuffix", () => {

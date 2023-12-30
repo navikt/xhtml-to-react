@@ -507,7 +507,7 @@ test('selectOneMenu', async () => {
       }
     }),
   ).toBe(
-    `<Select id="foo" value={form.foo}><option value="foo">ABC</option><option value="bar">Bar</option>{props["#{form.personList}"].map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select>\n`,
+    `<Select id="foo" value={form.foo}><option value={"foo"}>ABC</option><option value={"bar"}>Bar</option>{form.personList.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select>\n`,
   );
 });
 
@@ -521,7 +521,7 @@ test('selectOneMenu with a label inside it', () => {
     </t:selectOneMenu>
     `),
   ).toBe(
-    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value={form.foo}><option value="bar">Bar</option><option value="baz">Baz</option></Select></>\n`,
+    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value={form.foo}><option value={"bar"}>Bar</option><option value={"baz"}>Baz</option></Select></>\n`,
   );
 })
 
@@ -537,7 +537,7 @@ test('selectOneMenu with displayValueOnly', async () => {
       }
     }),
   ).toBe(
-    `<Select id="foo" value={form.foo} displayValueOnly={something}><option value="bar">Bar</option></Select>\n`,
+    `<Select id="foo" value={form.foo} displayValueOnly={something}><option value={"bar"}>Bar</option></Select>\n`,
   );
 });
 
@@ -556,7 +556,7 @@ test('selectOneRadio', async () => {
       }
     }),
   ).toBe(
-    `<SelectOneRadio id="kravStatusFilterId" layout="lineDirection" className="noBorder floatLeft" value="#{form.kravStatusFilter}"><input type="radio" value="#{true}"></input><input type="radio" value="#{false}"></input></SelectOneRadio>\n`,
+    `<SelectOneRadio id="kravStatusFilterId" layout="lineDirection" className="noBorder floatLeft" value={form.kravStatusFilter}><input type="radio" value={true}></input><input type="radio" value={false}></input></SelectOneRadio>\n`,
   );
 });
 
@@ -597,7 +597,7 @@ test('inputText displayValueOnly', () => {
     convert(`
     <t:inputText id="foo" value="Bla bla" displayValueOnly="true" />
     `),
-  ).toBe(`<InputText id="foo" value={"Bla bla"} displayValueOnly="true"/>\n`);
+  ).toBe(`<InputText id="foo" value={"Bla bla"} displayValueOnly={"true"}/>\n`);
 });
 
 test('div', () => {
@@ -605,7 +605,7 @@ test('div', () => {
     convert(`
     <t:div styleClass="the-css-class">ABC</t:div>
     `),
-  ).toBe(`<div className="the-css-class">ABC</div>\n`);
+  ).toBe(`<div className={"the-css-class"}>ABC</div>\n`);
 });
 
 test('commandLink', () => {
@@ -848,7 +848,7 @@ test('boolean checkbox', () => {
             listener="#{vilkarsprovingAction.changeListener('updateAllResultLists')}"/>
 </t:selectBooleanCheckbox>`),
   ).toBe(
-    `<input type="checkbox" id="the-id" className="the-class-name" checked="true"/>\n`,
+    `<input type="checkbox" id="the-id" className="the-class-name" checked={"true"}/>\n`,
   );
 });
 

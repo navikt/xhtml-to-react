@@ -98,7 +98,7 @@ export const Empty = createToken({
 export const Or = createToken({
   name: "Or",
   longer_alt: Identifier,
-  pattern: /or|\|\|/,
+  pattern: /(or)|(\|\|)/,
 });
 
 export const And = createToken({
@@ -135,6 +135,16 @@ export const Not = createToken({
   name: "Not",
   pattern: /!|not/,
   longer_alt: [NotEq, Identifier],
+});
+
+export const LParen = createToken({
+  name: "LParen",
+  pattern: /\(/,
+});
+
+export const RParen = createToken({
+  name: "RParen",
+  pattern: /\)/,
 });
 
 /*
@@ -176,6 +186,8 @@ export const tokens = [
   Gt,
   Lt,
   Identifier,
+  LParen,
+  RParen,
 ];
 
 export const allTokens = {

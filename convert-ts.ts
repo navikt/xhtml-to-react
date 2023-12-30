@@ -3357,7 +3357,7 @@ class Visitor {
               ts.factory.createJsxAttributes([
                 ts.factory.createJsxAttribute(
                   ts.factory.createIdentifier('value'),
-                  ts.factory.createStringLiteral(itemValue),
+                  ts.factory.createJsxExpression(undefined, spelOrStringLiteral(itemValue))
                 ),
               ]),
             ),
@@ -3371,10 +3371,16 @@ class Visitor {
         const value = child[':@']['@_value'];
         const varName = 'item';
 
-        const accessor = ts.factory.createElementAccessExpression(
-          ts.factory.createIdentifier('props'),
-          ts.factory.createStringLiteral(value),
-        );
+        let accessorAst;
+        try {
+          accessorAst = toTypeScript(value);
+        } catch (err) {
+          console.error('Could not parse SPEL ' + value, err);
+          accessorAst = ts.factory.createElementAccessExpression(
+            ts.factory.createIdentifier('props'),
+            ts.factory.createStringLiteral(value),
+          );
+        }
 
         const optionJsx = ts.factory.createJsxElement(
           ts.factory.createJsxOpeningElement(
@@ -3423,7 +3429,7 @@ class Visitor {
         const lambda = ts.factory.createJsxExpression(
           undefined,
           ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(accessor, 'map'),
+            ts.factory.createPropertyAccessExpression(accessorAst, 'map'),
             undefined,
             [
               ts.factory.createArrowFunction(
@@ -3514,7 +3520,7 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_layout') {
@@ -3612,7 +3618,7 @@ class Visitor {
               ),
               ts.factory.createJsxAttribute(
                 ts.factory.createIdentifier('value'),
-                ts.factory.createStringLiteral(itemValue),
+                ts.factory.createJsxExpression(undefined, spelOrStringLiteral(itemValue))
               ),
             ]),
           ),
@@ -3821,14 +3827,14 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('checked'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_disabled') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('disabled'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_tabindex') {
@@ -3892,7 +3898,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('displayValueOnly'),
-            ts.factory.createStringLiteral(value),
+            // ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_style') {
@@ -4898,7 +4905,7 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('id'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_forceId') {
@@ -4919,7 +4926,7 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_style') {

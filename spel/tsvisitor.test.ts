@@ -96,6 +96,11 @@ test("empty-expression", () => {
   assertDeepEqual(print(result2), `isEmpty(form.utenlandskIdentitetList)`);
 });
 
+test("Or-expression", () => {
+  const result = toTypeScript("#{a || b}");
+  assertDeepEqual(print(result), `a || b`);
+});
+
 test.skip("And-expression", () => {
   const result = toTypeScript("#{not a.nex and b}");
   assertDeepEqual(print(result), `!a.nex && b`);
@@ -104,6 +109,11 @@ test.skip("And-expression", () => {
 test('not equal', () => {
   const result = toTypeScript('#{form.tilbakekrevingBelopSkatt != 0}');
   assertDeepEqual(print(result), `form.tilbakekrevingBelopSkatt !== 0`);
+});
+
+test('Parenthesis', () => {
+  const result = toTypeScript('#{(a && b) || c}');
+  assertDeepEqual(print(result), `(a && b) || c`);
 });
 
 /*
