@@ -536,10 +536,16 @@ function numericValue(value: number) {
   return ts.factory.createJsxText('{' + value + '}')
 }
 
-function spelOrStringLiteral(input: string) {
+function spelOrStringLiteral(input: string, jsxExpressionIfNeeded: boolean) {
+  // replace &lt; with < and &gt; with > in input
+  input = input.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
   let inputAst;
   try {
     inputAst = toTypeScript(input);
+    if (jsxExpressionIfNeeded && !ts.isStringLiteral(inputAst)) {
+      inputAst = ts.factory.createJsxExpression(undefined, inputAst);
+    }
   } catch (err) {
     console.error('Could not parse SPEL: ' + input, err);
     inputAst = ts.factory.createStringLiteral(input);
@@ -1483,7 +1489,8 @@ class Visitor {
           attributes.push(
             ts.factory.createJsxAttribute(
               ts.factory.createIdentifier(reactAttributeName),
-              ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
+              spelOrStringLiteral(value, true),
+              // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
               // ts.factory.createStringLiteral(value),
             ),
           );
@@ -1504,7 +1511,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
             // ts.factory.createStringLiteral(value),
           ),
         );
@@ -1587,7 +1595,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_value') {
@@ -1638,7 +1647,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('columnClasses'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_rowClasses') {
@@ -1691,8 +1701,9 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('footerClassName'),
-            ts.factory.createJsxExpression(undefined,
-              spelOrStringLiteral(attributeValue)),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createJsxExpression(undefined,
+            // spelOrStringLiteral(attributeValue)),
             // ts.factory.createStringLiteral(attributeValue),
           ),
         );
@@ -1795,7 +1806,8 @@ class Visitor {
           cellAttributes.push(
             ts.factory.createJsxAttribute(
               ts.factory.createIdentifier('className'),
-              ts.factory.createStringLiteral(columnClasses[i]),
+              spelOrStringLiteral(columnClasses[i], true),
+              // ts.factory.createStringLiteral(columnClasses[i]),
             ),
           );
         }
@@ -1870,7 +1882,8 @@ class Visitor {
             footerAttributes.push(
               ts.factory.createJsxAttribute(
                 ts.factory.createIdentifier('className'),
-                ts.factory.createJsxExpression(undefined, spelOrStringLiteral(footerClass)),
+                spelOrStringLiteral(footerClass, true),
+                // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(footerClass)),
                 // ts.factory.createStringLiteral(footerClass),
               ),
             );
@@ -1952,7 +1965,8 @@ class Visitor {
       rowAttributes.push(
         ts.factory.createJsxAttribute(
           ts.factory.createIdentifier('className'),
-          ts.factory.createStringLiteral(rowStyleClass),
+          spelOrStringLiteral(rowStyleClass, true),
+          // ts.factory.createStringLiteral(rowStyleClass),
         ),
       );
     }
@@ -3106,7 +3120,8 @@ class Visitor {
           attributes.push(
             ts.factory.createJsxAttribute(
               ts.factory.createIdentifier('className'),
-              ts.factory.createStringLiteral(columnClasses[columnIdx]),
+              spelOrStringLiteral(columnClasses[columnIdx], true),
+              // ts.factory.createStringLiteral(columnClasses[columnIdx]),
             ),
           )
         }
@@ -3135,7 +3150,8 @@ class Visitor {
             rowAttributes.push(
               ts.factory.createJsxAttribute(
                 ts.factory.createIdentifier('className'),
-                ts.factory.createStringLiteral(rowClasses[rowIdx]),
+                spelOrStringLiteral(rowClasses[rowIdx], true),
+                // ts.factory.createStringLiteral(rowClasses[rowIdx]),
               ),
             )
           }
@@ -3168,7 +3184,8 @@ class Visitor {
         rowAttributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createStringLiteral(rowClasses[rowIdx]),
+            spelOrStringLiteral(rowClasses[rowIdx], true),
+            // ts.factory.createStringLiteral(rowClasses[rowIdx]),
           ),
         )
       }
@@ -3235,10 +3252,14 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
+            spelOrStringLiteral(value, true),
+            /*
             ts.factory.createJsxExpression(
               undefined,
               spelOrStringLiteral(value)
             )
+
+             */
           ),
         );
       } else if (key === '@_label') {
@@ -3279,24 +3300,29 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('readOnly'),
-            ts.factory.createStringLiteral(value),
+            spelOrStringLiteral(value, true),
+            // ts.factory.createStringLiteral(value),
           ),
         );
       } else if (key === '@_disabled') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('disabled'),
-            ts.factory.createStringLiteral(value),
+            spelOrStringLiteral(value, true),
+            // ts.factory.createStringLiteral(value),
           ),
         );
       } else if (key === '@_displayValueOnly') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('displayValueOnly'),
+            spelOrStringLiteral(value, true),
+            /*
             ts.factory.createJsxExpression(
               undefined,
               spelOrStringLiteral(value)
             )
+             */
           ),
         );
       } else if (key === '@_displayValueOnlyStyleClass') {
@@ -3357,7 +3383,8 @@ class Visitor {
               ts.factory.createJsxAttributes([
                 ts.factory.createJsxAttribute(
                   ts.factory.createIdentifier('value'),
-                  ts.factory.createJsxExpression(undefined, spelOrStringLiteral(itemValue))
+                  spelOrStringLiteral(itemValue, true),
+                  // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(itemValue))
                 ),
               ]),
             ),
@@ -3520,7 +3547,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_layout') {
@@ -3618,7 +3646,8 @@ class Visitor {
               ),
               ts.factory.createJsxAttribute(
                 ts.factory.createIdentifier('value'),
-                ts.factory.createJsxExpression(undefined, spelOrStringLiteral(itemValue))
+                spelOrStringLiteral(itemValue, true),
+                // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(itemValue))
               ),
             ]),
           ),
@@ -3827,14 +3856,16 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('checked'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_disabled') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('disabled'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_tabindex') {
@@ -3899,7 +3930,8 @@ class Visitor {
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('displayValueOnly'),
             // ts.factory.createStringLiteral(value),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_style') {
@@ -3926,7 +3958,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value)),
             // ts.factory.createStringLiteral(value),
           ),
         );
@@ -4136,7 +4169,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('value'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
             // ts.factory.createStringLiteral(attributeValue),
           ),
         );
@@ -4144,7 +4178,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('readOnly'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
             // ts.factory.createStringLiteral(attributeValue),
           ),
         );
@@ -4152,7 +4187,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('disabled'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(attributeValue)),
             // ts.factory.createStringLiteral(attributeValue),
           ),
         );
@@ -4555,21 +4591,24 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('id'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_value') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('href'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_styleClass') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_class') {
@@ -4577,14 +4616,16 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_target') {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('target'),
-            ts.factory.createStringLiteral(attributeValue),
+            spelOrStringLiteral(attributeValue, true),
+            // ts.factory.createStringLiteral(attributeValue),
           ),
         );
       } else if (key === '@_tabindex') {
@@ -4905,7 +4946,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('id'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_forceId') {
@@ -4926,7 +4968,8 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('className'),
-            ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
+            spelOrStringLiteral(value, true),
+            // ts.factory.createJsxExpression(undefined, spelOrStringLiteral(value))
           ),
         );
       } else if (key === '@_style') {

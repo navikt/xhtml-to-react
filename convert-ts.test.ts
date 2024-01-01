@@ -176,7 +176,7 @@ test('htmlTag', () => {
     </t:htmlTag>
     `),
   ).toBe(
-    `<div className={"outer"}><span className={"inner"}>Hello World</span></div>\n`,
+    `<div className="outer"><span className="inner">Hello World</span></div>\n`,
   );
 });
 
@@ -185,7 +185,7 @@ test('htmlTag with rendered attribute', () => {
     convert(`
     <t:htmlTag value="div" id="test-id" style="width: 100px; height: 200px" styleClass="outer" rendered="#{form.show}">Foo</t:htmlTag>
     `)
-  ).toBe(`{form.show && <div id="test-id" style={{ "width": "100px", "height": "200px" }} className={"outer"}>Foo</div>}\n`);
+  ).toBe(`{form.show && <div id="test-id" style={{ "width": "100px", "height": "200px" }} className="outer">Foo</div>}\n`);
 });
 
 test('htmlTag with params', () => {
@@ -196,7 +196,7 @@ test('htmlTag with params', () => {
       Foo
     </t:htmlTag>
     `)
-  ).toBe(`<div className={"the-css-class"}>Foo</div>\n`);
+  ).toBe(`<div className="the-css-class">Foo</div>\n`);
 })
 
 test('composition: should use a React component', () => {
@@ -382,7 +382,7 @@ test('Data Table', () => {
           </t:dataTable>
           `),
   ).toBe(
-    `<DataTable id="the-id" className="the-class-name" style={{ "color": "red" }} headerClassName="the-header-class" columnClasses="a, b, c" rowClasses="d, e, f" footerClassName={"the-footer-class"}><thead><tr><th>Global header</th></tr></thead><thead><tr><th><span>Foo</span></th><th>Bar</th></tr></thead><tbody>{form.inntektsDetaljer.map((post, theIndexVar) => <tr className="#{post.rowStyle}"><td className="a">Foo Content</td><td className="b">Bar Content</td></tr>)}</tbody><tfoot><tr><td>Foo Footer</td><td>Bar Footer</td></tr></tfoot><tfoot><tr><td className={"the-footer-class"} colSpan={9999}>Global footer</td></tr></tfoot></DataTable>\n`,
+    `<DataTable id="the-id" className="the-class-name" style={{ "color": "red" }} headerClassName="the-header-class" columnClasses="a, b, c" rowClasses="d, e, f" footerClassName="the-footer-class"><thead><tr><th>Global header</th></tr></thead><thead><tr><th><span>Foo</span></th><th>Bar</th></tr></thead><tbody>{form.inntektsDetaljer.map((post, theIndexVar) => <tr className={post.rowStyle}><td className="a">Foo Content</td><td className="b">Bar Content</td></tr>)}</tbody><tfoot><tr><td>Foo Footer</td><td>Bar Footer</td></tr></tfoot><tfoot><tr><td className="the-footer-class" colSpan={9999}>Global footer</td></tr></tfoot></DataTable>\n`,
   );
 });
 
@@ -507,7 +507,7 @@ test('selectOneMenu', async () => {
       }
     }),
   ).toBe(
-    `<Select id="foo" value={form.foo}><option value={"foo"}>ABC</option><option value={"bar"}>Bar</option>{form.personList.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select>\n`,
+    `<Select id="foo" value={form.foo}><option value="foo">ABC</option><option value="bar">Bar</option>{form.personList.map(item => <option key={item.value} value={item.value}>{item.label}</option>)}</Select>\n`,
   );
 });
 
@@ -521,7 +521,7 @@ test('selectOneMenu with a label inside it', () => {
     </t:selectOneMenu>
     `),
   ).toBe(
-    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value={form.foo}><option value={"bar"}>Bar</option><option value={"baz"}>Baz</option></Select></>\n`,
+    `<><label htmlFor="selectedYearId" className="hidden">the label</label><Select id="foo" value={form.foo}><option value="bar">Bar</option><option value="baz">Baz</option></Select></>\n`,
   );
 })
 
@@ -537,7 +537,7 @@ test('selectOneMenu with displayValueOnly', async () => {
       }
     }),
   ).toBe(
-    `<Select id="foo" value={form.foo} displayValueOnly={something}><option value={"bar"}>Bar</option></Select>\n`,
+    `<Select id="foo" value={form.foo} displayValueOnly={something}><option value="bar">Bar</option></Select>\n`,
   );
 });
 
@@ -588,7 +588,7 @@ styleClass="inputstyle"
 title="Enter the number of your choice."/>
     `),
   ).toBe(
-    `<InputText id="foo" value={"Enter number"} required="true" maxLength="100" style={{ "color": "#0033CC", "fontWeight": "bold" }} className="inputstyle" title="Enter the number of your choice."/>\n`,
+    `<InputText id="foo" value="Enter number" required="true" maxLength="100" style={{ "color": "#0033CC", "fontWeight": "bold" }} className="inputstyle" title="Enter the number of your choice."/>\n`,
   );
 });
 
@@ -597,7 +597,7 @@ test('inputText displayValueOnly', () => {
     convert(`
     <t:inputText id="foo" value="Bla bla" displayValueOnly="true" />
     `),
-  ).toBe(`<InputText id="foo" value={"Bla bla"} displayValueOnly={"true"}/>\n`);
+  ).toBe(`<InputText id="foo" value="Bla bla" displayValueOnly="true"/>\n`);
 });
 
 test('div', () => {
@@ -605,7 +605,7 @@ test('div', () => {
     convert(`
     <t:div styleClass="the-css-class">ABC</t:div>
     `),
-  ).toBe(`<div className={"the-css-class"}>ABC</div>\n`);
+  ).toBe(`<div className="the-css-class">ABC</div>\n`);
 });
 
 test('commandLink', () => {
@@ -848,7 +848,7 @@ test('boolean checkbox', () => {
             listener="#{vilkarsprovingAction.changeListener('updateAllResultLists')}"/>
 </t:selectBooleanCheckbox>`),
   ).toBe(
-    `<input type="checkbox" id="the-id" className="the-class-name" checked={"true"}/>\n`,
+    `<input type="checkbox" id="the-id" className="the-class-name" checked="true"/>\n`,
   );
 });
 
@@ -876,7 +876,7 @@ test('input textarea h', () => {
                                      styleClass="modalDialogTextArea" onkeyup="enableOkIfEnoughText()"/>
     `),
   ).toBe(
-    `<Textarea id="begrunnelse" value={"foobar"} rows="6" cols="100" className="modalDialogTextArea" onKeyUp="enableOkIfEnoughText()"></Textarea>\n`,
+    `<Textarea id="begrunnelse" value="foobar" rows="6" cols="100" className="modalDialogTextArea" onKeyUp="enableOkIfEnoughText()"></Textarea>\n`,
   );
 });
 

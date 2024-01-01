@@ -113,7 +113,12 @@ test('not equal', () => {
 
 test('Parenthesis', () => {
   const result = toTypeScript('#{(a && b) || c}');
-  assertDeepEqual(print(result), `(a && b) || c`);
+  assertDeepEqual(print(result), `a && b || c`);
+});
+
+test('Parenthesis with operator precedence', () => {
+  const result = toTypeScript('#{(a || b) && c}');
+  assertDeepEqual(print(result), `(a || b) && c`);
 });
 
 /*
