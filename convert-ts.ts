@@ -4699,7 +4699,7 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('src'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createStringLiteral('/psak' + value),
           ),
         );
       } else if (key === '@_url') {
@@ -4707,7 +4707,7 @@ class Visitor {
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('src'),
-            ts.factory.createStringLiteral(value),
+            ts.factory.createStringLiteral('/psak' + value),
           ),
         );
       } else if (key === '@_alt') {

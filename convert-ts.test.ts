@@ -56,7 +56,7 @@ test('unicode - æøå', () => {
           '196.tooltip.Utfor': 'Utf\u00f8r oppgaven'
         }
       }
-    )).toBe(`<img src="/images/icon_play1_16x16.gif" alt={"Utfør oppgaven"}/>\n`);
+    )).toBe(`<img src="/psak/images/icon_play1_16x16.gif" alt={"Utfør oppgaven"}/>\n`);
 });
 
 test('h: prefix should work with outputText', () => {
@@ -708,7 +708,7 @@ test('image', () => {
         'Foo': 'Bar',
       }
     }),
-  ).toBe(`<img src="/images/example.gif" alt={"Bar"}/>\n`);
+  ).toBe(`<img src="/psak/images/example.gif" alt={"Bar"}/>\n`);
 });
 
 test('h image', () => {
@@ -717,7 +717,7 @@ test('h image', () => {
     <h:graphicImage url="/images/example.gif"
                     alt="alt text"/>
     `),
-  ).toBe(`<img src="/images/example.gif" alt={"alt text"}/>\n`);
+  ).toBe(`<img src="/psak/images/example.gif" alt={"alt text"}/>\n`);
 });
 
 test('outputScript', () => {
