@@ -787,6 +787,34 @@ class Visitor {
       this.addWarning('h:inputHidden is not implemented in the migration script.');
     } else if ('h:outputStylesheet' in node) {
       this.addWarning('h:outputStylesheet is not implemented in the migration script.');
+    } else if ('ui:param' in node) {
+      this.addWarning('There was an unexpected ui:param that has to be migrated manually.');
+      // empty JSX fragment
+      this.result = ts.factory.createJsxFragment(
+        ts.factory.createJsxOpeningFragment(),
+        [],
+        ts.factory.createJsxJsxClosingFragment(),
+      );
+    } else if ("h:selectManyCheckbox" in node) {
+      this.addWarning('h:selectManyCheckbox is not implemented yet');
+      // Create <div>TODO: Implement selectManyCheckbox</div>
+      this.result = ts.factory.createJsxElement(
+        ts.factory.createJsxOpeningElement(ts.factory.createIdentifier('div'), undefined, ts.factory.createJsxAttributes([])),
+        [
+          ts.factory.createJsxText('TODO: Implement selectManyCheckbox'),
+        ],
+        ts.factory.createJsxClosingElement(ts.factory.createIdentifier('div')),
+      );
+    } else if ('h:selectManyListbox' in node) {
+      this.addWarning('h:selectManyListbox is not implemented yet');
+      // Create <div>TODO: Implement selectManyListbox</div>
+      this.result = ts.factory.createJsxElement(
+        ts.factory.createJsxOpeningElement(ts.factory.createIdentifier('div'), undefined, ts.factory.createJsxAttributes([])),
+        [
+          ts.factory.createJsxText('TODO: Implement selectManyListbox'),
+        ],
+        ts.factory.createJsxClosingElement(ts.factory.createIdentifier('div')),
+      );
     } else {
       throw new Error('Unknown node: ' + JSON.stringify(node));
     }
@@ -1022,7 +1050,13 @@ class Visitor {
       }
     });
 
-    const template = node[':@']['@_template'];
+    let template = node[':@']['@_template'];
+
+    if (template === "#{form.kravContext ? '/templates/ramme-skjermbildemal-vilkarsprovingut.xhtml' : '/templates/ramme-skjermbildemal.xhtml'}") {
+      this.addWarning("The template has an if/else in it - maybe migrate that manually.")
+      template = 'SomeWeirdComponentWithTernaryOperator';
+    }
+
     // Use the last part of the path, remove xhtml extension, capitalize, camelcase
     // for example: /a/b/c/foo-bar.xml -> FooBar
     // (Thank you, GitHub Copilot)
@@ -1368,7 +1402,7 @@ class Visitor {
         } else if (key === 'nav:outputPid') {
           this.addWarning('WARN: <nav:outputPid> in <t:outputText> is probably a mistake. This should be migrated manually!');
         } else {
-          throw new Error('WARN: Unknown child in <t:outputText>: ' + key);
+          this.addWarning('WARN: Unknown child in <t:outputText>: ' + key);
         }
       }
     }
@@ -1579,7 +1613,9 @@ class Visitor {
     let rowStyleClass;
     let rendered;
     let columnClasses: string[] = [];
+    let rowClasses: string[] = [];
     let footerClass;
+    let headerClass;
 
     for (const [key, attributeValue] of Object.entries(node[':@'] ?? {})) {
       if (key === '@_rendered') {
@@ -1652,6 +1688,11 @@ class Visitor {
           ),
         );
       } else if (key === '@_rowClasses') {
+        // Skip auto-setup of rowClasses if it's dynamically evaluated.
+        if (!attributeValue.startsWith('#{') && !attributeValue.startsWith('${')) {
+          rowClasses = attributeValue.split(',').map(str => str.trim());
+        }
+
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('rowClasses'),
@@ -1690,6 +1731,7 @@ class Visitor {
           );
         }
       } else if (key === '@_headerClass') {
+        headerClass = attributeValue;
         attributes.push(
           ts.factory.createJsxAttribute(
             ts.factory.createIdentifier('headerClassName'),
@@ -1760,12 +1802,22 @@ class Visitor {
 
             // create <th> and add to headers
             if (name === 'header') {
+              const attributes = [];
+              if (headerClass !== undefined) {
+                attributes.push(
+                  ts.factory.createJsxAttribute(
+                    ts.factory.createIdentifier('className'),
+                    spelOrStringLiteral(headerClass, true),
+                  ),
+                );
+              }
+
               headers.push(
                 ts.factory.createJsxElement(
                   ts.factory.createJsxOpeningElement(
                     ts.factory.createIdentifier('th'),
                     undefined,
-                    ts.factory.createJsxAttributes([]),
+                    ts.factory.createJsxAttributes(attributes),
                   ),
                   // [],
                   facetContent,
@@ -2269,6 +2321,11 @@ class Visitor {
             ts.factory.createIdentifier('className'),
             ts.factory.createStringLiteral(value),
           ),
+        );
+      } else if (key === '@_style') {
+        const parsedStyle = this.cssStringToReact(value);
+        attributes.push(
+          this.makeStyleJsxAttribute(parsedStyle)
         );
       } else if (key === '@_name') {
         attributes.push(
@@ -3499,7 +3556,7 @@ class Visitor {
       } else if ('script' in child) {
         this.addWarning('WARN: <script> in selectOneMenu is not supported.');
       } else {
-        throw new Error('Unexpected child ' + Object.keys(child).join(', '));
+        this.addWarning('Unexpected child in selectOneMenu ' + Object.keys(child).join(', '));
       }
     }
 
@@ -4069,6 +4126,16 @@ class Visitor {
             ts.factory.createStringLiteral(value),
           ),
         );
+      } else if (key === '@_p:autofocus') {
+        // add autoFocus={true}
+
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('autoFocus'),
+            ts.factory.createJsxText(`{true}`)
+          )
+        );
+
       } else if (key === '@_rendered') {
         rendered = value;
       } else {
@@ -4564,6 +4631,8 @@ class Visitor {
         );
       } else if (key === '@_rendered') {
         rendered = value;
+      } else if (key === '@_image') {
+        this.addWarning('WARN: commandButton with image is not supported yet, must be implemented manually.');
       } else {
         throw new Error('Unexpected attribute in commandButton: ' + key);
       }
@@ -4646,6 +4715,20 @@ class Visitor {
                 ts.factory.createStringLiteral(attributeValue),
               ),
             ),
+          ),
+        );
+      } else if (key === '@_accesskey') {
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('accessKey'),
+            spelOrStringLiteral(attributeValue, true),
+          ),
+        );
+      } else if (key === '@_title') {
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('title'),
+            spelOrStringLiteral(attributeValue, true),
           ),
         );
       } else if (key === '@_rendered') {

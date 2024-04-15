@@ -382,7 +382,7 @@ test('Data Table', () => {
           </t:dataTable>
           `),
   ).toBe(
-    `<DataTable id="the-id" className="the-class-name" style={{ "color": "red" }} headerClassName="the-header-class" columnClasses="a, b, c" rowClasses="d, e, f" footerClassName="the-footer-class"><thead><tr><th>Global header</th></tr></thead><thead><tr><th><span>Foo</span></th><th>Bar</th></tr></thead><tbody>{form.inntektsDetaljer.map((post, theIndexVar) => <tr className={post.rowStyle}><td className="a">Foo Content</td><td className="b">Bar Content</td></tr>)}</tbody><tfoot><tr><td>Foo Footer</td><td>Bar Footer</td></tr></tfoot><tfoot><tr><td className="the-footer-class" colSpan={9999}>Global footer</td></tr></tfoot></DataTable>\n`,
+    `<DataTable id="the-id" className="the-class-name" style={{ "color": "red" }} headerClassName="the-header-class" columnClasses="a, b, c" rowClasses="d, e, f" footerClassName="the-footer-class"><thead><tr><th>Global header</th></tr></thead><thead><tr><th className="the-header-class"><span>Foo</span></th><th className="the-header-class">Bar</th></tr></thead><tbody>{form.inntektsDetaljer.map((post, theIndexVar) => <tr className={post.rowStyle}><td className="a">Foo Content</td><td className="b">Bar Content</td></tr>)}</tbody><tfoot><tr><td>Foo Footer</td><td>Bar Footer</td></tr></tfoot><tfoot><tr><td className="the-footer-class" colSpan={9999}>Global footer</td></tr></tfoot></DataTable>\n`,
   );
 });
 

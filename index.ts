@@ -31,9 +31,12 @@ try {
     'registrerjournalpost.xhtml',
     'opptjeningsdetaljer.xhtml',
     'opptjeningsendringer.xhtml',
+    'ilkarsproving.xhtml',
+    // 'vilkarsvurderinguforetrygd-accordionpanel.xhtml',
     'tjenestepensjonsforhold.xhtml', // micro frontend
     'familieforholdpsak2-layout.xhtml', // micro frontend
     'utregning.xhtml', // micro frontend
+    'kravkontroll.xhtml', // micro frontend
     'leveattesthistorikk.xhtml', // micro frontend
     'landtilknytning-layout.xhtml', // micro frontend
     'oppgaveoversikt.xhtml', // micro frontend
@@ -41,10 +44,14 @@ try {
     'brukerprofil.xhtml', // micro frontend
     'pensjonsytelser.xhtml', // micro frontend
     'pensjonssaker.xhtml', // micro frontend
+    'opprettsak.xhtml', // micro frontend
+    'vergeogpengemottaker.xhtml', // micro frontend
+    'overforesak.xhtml', // micro frontend
     'sortColumnHeader.xhtml', // pga er en felleskomponent, greier med f:facet
     'pageingFooterNrScroller.xhtml', // pga er en felleskomponent, greier med f:facet
     'column.xhtml', // pga er en felleskomponent, greier med h:column
     'sortColumn.xhtml', // pga er en felleskomponent, greier med h:column
+    'menuSubflow.xhtml', // not working, but let's skip it
   ];
   const files = glob
     .sync(
