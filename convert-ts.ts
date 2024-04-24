@@ -4462,6 +4462,20 @@ class Visitor {
             ts.factory.createStringLiteral(value),
           ),
         );
+      } else if (key === '@_p:data-trackingid' || key === '@_data-trackingid') {
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('data-trackingid'),
+            ts.factory.createStringLiteral(value),
+          ),
+        );
+      } else if (key === '@_p:data-trackinglabel') {
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('data-trackinglabel'),
+            ts.factory.createStringLiteral(value),
+          ),
+        );
       } else if (key === '@_rendered') {
         rendered = value;
       } else {
@@ -4633,6 +4647,20 @@ class Visitor {
         rendered = value;
       } else if (key === '@_image') {
         this.addWarning('WARN: commandButton with image is not supported yet, must be implemented manually.');
+      } else if (key === '@_p:data-trackingid') {
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('data-trackingid'),
+            ts.factory.createStringLiteral(value),
+          ),
+        );
+      } else if (key === '@_p:data-trackinglabel') {
+        attributes.push(
+          ts.factory.createJsxAttribute(
+            ts.factory.createIdentifier('data-trackinglabel'),
+            ts.factory.createStringLiteral(value),
+          ),
+        );
       } else {
         throw new Error('Unexpected attribute in commandButton: ' + key);
       }
