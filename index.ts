@@ -70,8 +70,8 @@ try {
     // guess component name: take the file name, strip xhtml, PascalCase it, for example ab-cd-ef should be AbCdEf
     const componentName = file.substring(file.lastIndexOf('/') + 1, file.lastIndexOf('.')).split('-').map((part) => part[0].toUpperCase() + part.substring(1)).join('');
 
-    // const output = currentDirname + '/output';
-    const output = currentDirname + '/../storybook-psak/src/generated';
+    const output = currentDirname + '/output';
+    // const output = currentDirname + '/../storybook-psak/src/generated';
 
     const outputPath = file.replace('../pensjon-psak/psak/src/main/resources/webapp/pages', output).replace('.xhtml', '.tsx');
     const outputDir = outputPath.substring(0, outputPath.lastIndexOf('/'));
